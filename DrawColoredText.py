@@ -1,4 +1,4 @@
-import pyfiglet  # Fixed the missing 'i' here!
+import pyfiglet 
 
 colorArray = {
     "red": "\033[1;31m",
