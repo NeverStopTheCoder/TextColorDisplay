@@ -72,17 +72,33 @@ def DrawColoredText():
 
             chunk_arts = []
             for text, color in chunks:
+                if not text:
+                    continue
                 art_lines = pyfiglet.figlet_format(text, font="univers").splitlines()
                 chunk_arts.append((art_lines, color))
 
             max_rows = max(len(art[0]) for art in chunk_arts) if chunk_arts else 0
 
+            # 1. Print the giant ASCII rows safely (converting underline codes to bold so they don't turn cyan)
             for i in range(max_rows):
                 line_output = ""
                 for art_lines, color in chunk_arts:
                     row = art_lines[i] if i < len(art_lines) else ""
-                    line_output += f"{color}{row}"
+                    clean_color = color.replace("\033[4;", "\033[1;") if color else RESET
+                    line_output += f"{clean_color}{row}"
                 print(f"{line_output}{RESET}")
+
+            # 2. Draw a beautiful, true underline bar underneath the blocks that requested it
+            underline_row = ""
+            for art_lines, color in chunk_arts:
+                block_width = max(len(line) for line in art_lines) if art_lines else 0
+                if color and "\033[4;" in color:
+                    underline_row += f"{color}{'═' * block_width}{RESET}"
+                else:
+                    underline_row += " " * block_width
+            
+            if underline_row.strip():
+                print(underline_row)
 
             break
         else:
